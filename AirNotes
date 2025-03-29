@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirNotes - Login</title>
+    <style>/* Authentication Container */
+        #auth-container {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 400px;
+            margin: 100px auto;
+        }
+        
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        input {
+            padding: 10px;
+            margin-top: 5px;
+            border: 2px solid #27ae60;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        
+        button {
+            background-color: #27ae60;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s ease-in-out;
+        }
+        
+        button:hover {
+            background-color: #1e8449;
+        }
+        
+        /* Hide main content initially */
+        #main-content {
+            display: none;
+        }
+        
+        /* Logout Button */
+        #logout {
+            background-color: red;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            position: absolute;
+            right: 10px;
+            top: 10px;
+        }
+        
+        #logout:hover {
+            background-color: darkred;
+        }
+        </style>
+</head>
+
+<body>
+    <!-- Sign Up & Login Container -->
+    <div id="auth-container">
+        <h1>Welcome to AirNotes</h1>
+        <p>Please sign in or sign up</p>
+
+        <!-- Login Form -->
+        <form id="login-form">
+            <h2>Login</h2>
+            <label for="login-email">Email:</label>
+            <input type="email" id="login-email" required>
+            <label for="login-password">Password:</label>
+            <input type="password" id="login-password" required>
+            <button type="submit">Login</button>
+        </form>
+
+        <p>Don't have an account? <a href="#" id="show-signup">Sign Up</a></p>
+
+        <!-- Sign Up Form (Hidden by Default) -->
+        <form id="signup-form" style="display: none;">
+            <h2>Sign Up</h2>
+            <label for="signup-email">Email:</label>
+            <input type="email" id="signup-email" required>
+            <label for="signup-password">Password:</label>
+            <input type="password" id="signup-password" required>
+            <button type="submit">Sign Up</button>
+        </form>
+    </div>
+
+    <!-- Main AirNotes Content -->
+    <div id="main-content" style="display: none;">
+        <header>
+            <h1>AirNotes</h1>
+            <p>Your personal note-taking app</p>
+            <button id="logout">Logout</button>
+        </header>
+        <main>
+            <section id="note-form">
+                <h2>Create a New Note</h2>
+                <form id="new-note-form">
+                    <label for="note-title">Title:</label>
+                    <input type="text" id="note-title" required>
+                    <label for="note-content">Content:</label>
+                    <textarea id="note-content" required></textarea>
+                    <button type="submit">Save Note</button>
+                </form>
+            </section>
+
+            <section id="notes-list">
+                <h2>Your Notes</h2>
+                <ul id="notes"></ul>
+            </section>
+        </main>
+        <footer>
+            <p>&copy; 2025 AirNotes. All rights reserved.</p>
+            <p>Developed by Virtuality Tech</p>
+        </footer>
+    </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+    const loginForm = document.getElementById("login-form");
+    const signupForm = document.getElementById("signup-form");
+    const loginEmail = document.getElementById("login-email");
+    const loginPassword = document.getElementById("login-password");
+    const signupEmail = document.getElementById("signup-email");
+    const signupPassword = document.getElementById("signup-password");
+    const authContainer = document.getElementById("auth-container");
+    const mainContent = document.getElementById("main-content");
+    const logoutButton = document.getElementById("logout");
+
+    const noteForm = document.getElementById("new-note-form");
+    const noteTitleInput = document.getElementById("note-title");
+    const noteContentInput = document.getElementById("note-content");
+    const notesList = document.getElementById("notes");
+
+    const showSignupLink = document.getElementById("show-signup");
+
+    // Show Sign Up Form
+    showSignupLink.addEventListener("click", (event) => {
+        event.preventDefault();
+        loginForm.style.display = "none";
+        signupForm.style.display = "block";
+    });
+
+    // Check if user is logged in
+    function checkLogin() {
+        const loggedIn = localStorage.getItem("loggedIn");
+        if (loggedIn === "true") {
+            showMainContent();
+        }
+    }
+
+    // Handle Sign Up
+    signupForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const email = signupEmail.value.trim();
+        const password = signupPassword.value.trim();
+
+        if (email === "" || password.length < 4) {
+            alert("Please enter a valid email and a password with at least 4 characters.");
+            return;
+        }
+
+        // Store user credentials in localStorage
+        localStorage.setItem("userEmail", email);
+        localStorage.setItem("userPassword", password);
+        localStorage.setItem("loggedIn", "true"); // Automatically log in after sign-up
+
+        alert("Sign-up successful! Redirecting to AirNotes...");
+        showMainContent(); // Redirect user to note-taking page
+    });
+
+    // Handle Login
+    loginForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const email = loginEmail.value.trim();
+        const password = loginPassword.value.trim();
+
+        const storedEmail = localStorage.getItem("userEmail");
+        const storedPassword = localStorage.getItem("userPassword");
+
+        if (email === storedEmail && password === storedPassword) {
+            localStorage.setItem("loggedIn", "true"); // Store login status
+            alert("Login successful! Redirecting...");
+            showMainContent(); // Redirect to note-taking page
+        } else {
+            alert("Incorrect email or password.");
+        }
+    });
+
+    // Show main content and hide login/signup
+    function showMainContent() {
+        authContainer.style.display = "none";
+        mainContent.style.display = "block";
+        loadNotes();
+    }
+
+    // Handle Logout
+    logoutButton.addEventListener("click", () => {
+        localStorage.removeItem("loggedIn");
+        location.reload(); // Refresh page to show login screen
+    });
+
+    // Load Notes
+    function loadNotes() {
+        notesList.innerHTML = "";
+        const notes = JSON.parse(localStorage.getItem("notes")) || [];
+        notes.forEach((note, index) => addNoteToDOM(note.title, note.content, index));
+    }
+
+    // Add Notes
+    function addNoteToDOM(title, content, index) {
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>${title}</strong><p>${content}</p><button class="delete-btn" data-index="${index}">Delete</button>`;
+        notesList.appendChild(li);
+    }
+
+    // Initialize Login Check
+    checkLogin();
+});
+
+    </script>
+</body>
+
+</html>
